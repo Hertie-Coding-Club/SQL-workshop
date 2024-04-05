@@ -80,7 +80,7 @@ WHERE SIDE = 'buy' GROUP BY STRATEGY
 If you want to do more complicate query, `Subquery` and `With` statements are inevitable.  
 For example, for solving the next question, we can use subquery way (1) and with statements way (2)  
 
-Question: Select rows of which price is higher than average price
+Question: Select rows which have price is higher than average price
 
 #### 1. Subquery  
 
