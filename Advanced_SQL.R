@@ -12,7 +12,7 @@ query_sub <- "SELECT * FROM EPEX_12_20_12_13 WHERE PRICE >
 "
 dbGetQuery(con, query_sub)
 
-## The other: WITH 
+## The other: With
 
 query_with <- "WITH ABOVE_AVG AS (
 SELECT * FROM EPEX_12_20_12_13 WHERE PRICE > (SELECT AVG(PRICE) FROM EPEX_12_20_12_13))
