@@ -10,17 +10,23 @@ dbGetQuery(con, "")
 # Calculate average price 
 dbGetQuery(con, "")
 
+
+
+
 # WHERE conditions
 
 # Select only trades with a price greater than 10
 dbGetQuery(con, "")
 
-# Select only trades with a price greater than 10, on the buy side
+# Select only trades with a price greater than 13, on the buy side
 dbGetQuery(con, "")
 
 
 # How many trades have a quantity below 15?
 dbGetQuery(con, "")
+
+
+
 
 
 # Use "group by" function and aggregate functions
@@ -31,9 +37,9 @@ dbGetQuery(con, "")
 # What is the highest price on a trade, on the sell side, with a quantity of over 13? Which one is it?
 dbGetQuery(con, "")
 
-# If the query length is getting longer, you can type it separately.
+# Order all trades on the sell side, extracting quantity, price and id, in descending order.
+dbGetQuery(con, "")
 
-epex_12_20_12_13query <- "SELECT STRATEGY, SUM(QUANTITY) FROM EPEX_12_20_12_13 
-WHERE SIDE = 'buy' GROUP BY STRATEGY"
-dbGetQuery(con, query)
+
+
 
