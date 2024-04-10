@@ -9,7 +9,7 @@ Place: Maker Space
   * [Preparation](#Preparation)
   * [Data](#Data)
   * [Session 1](#Session-1)   
-  * [Session 2](#Session-2)
+  * [Session 2](#session-2-subquery-with-and-join)
 
 
 ## Background.
@@ -23,7 +23,7 @@ The workshop consists of two sessions. The first is **basic SQL**, and the secon
 Originally, for learning SQL, installing DataBase Management System (DBMS) is preferable. But it takes too long and the file size is also too large. So, for a smooth workshop, we will use **R programming** together. That is, this workshop is based on **SQL** and **R**. Therefore, installing R studio is necessary.
 
 ### Data 
-During the session, we handle `trades.sqlite` database. And in the database, only one table exists: `epex_12_20_12_13`. **This table is about selling and buying a unit of electricty.** 
+In the worshop, we handle **energy trading** data. Specifically, the database name is `trades.sqlite`. And in the database, two table exists: `epex_12_20_12_13`,`epex_user`. We will talk about `epex_user` later in [JOIN](#3-join) session. **This table is about selling and buying a unit of electricty.**. And it also include what strategy (strategy_1, strategy_2) used 
 |      id|  quantity|price |side |strategy  |
 |--------|----------|------|-----|----------|
 | trade_1|        5 |   20 | buy |strategy_1|
@@ -75,12 +75,12 @@ SELECT STRATEGY, SUM(QUANTITY) FROM EPEX_12_20_12_13
 WHERE SIDE = 'buy' GROUP BY STRATEGY
 ```
 
-### Session 2 
+### Session 2: Subquery, With, and Join 
 
 If you want to do more complicate query, `Subquery` and `With` statements are inevitable.  
 For example, for solving the next question, we can use subquery way (1) and with statements way (2)  
 
-Question: Select rows which have price is higher than average price
+Question: Select rows which have price higher than average price
 
 #### 1. Subquery  
 
@@ -121,3 +121,83 @@ SELECT * FROM EPEX_12_20_12_13 WHERE PRICE > (SELECT AVG(PRICE) FROM EPEX_12_20_
 SELECT * FROM ABOVE_AVG
 ```
 
+#### 3. JOIN
+
+Congratulations!! We solved our problem! Now, we turn to the other topic, which is very important. 
+
+#### Added Data 
+
+For Join, we need at least one more data. In the `trades.sqlite`, there is a table named "epex_user". 
+
+|      id|  name| side|
+|--------|------|-----|
+| trade_1| Minho|  buy|
+| trade_3| Lonny|  buy| 
+| trade_4|Daniel| sell|
+| trade_7|  Miri|  buy|
+
+And below is the scheme. 
+
+```sqlite
+id TEXT PRIMARY KEY,
+name VARCHAR(255)
+```
+
+##### 3.1 Inner Join
+
+![inner](pic/inner-join.png)
+
+First, let's see inner join. 
+
+```sqlite
+SELECT * FROM EPEX_12_20_12_13 AS A 
+INNER JOIN EPEX_USER AS B 
+ON A.ID = B.ID 
+```
+
+There are two important points here.
+
+1. Each table has to be aliased for convienece.
+
+First, if you don't set alias, the query is getting crazy. When you just want to select `quantity` column in a join table, the query has to be below. 
+
+```sqlite
+SELECT EPEX_12_20_12_13.QUANTITY FROM EPEX_12_20_12_13 INNER JOIN EPEX_USER ON EPEX_12_20_12_13.ID = EPEX_USER.ID 
+```
+But if you use alias, the query becomes simpler
+
+```sqlite
+SELECT A.QUANTITY FROM EPEX_12_20_12_13 AS A INNER JOIN EPEX_USER AS B ON A.ID = B.ID 
+```
+2. The join criterion is "Primary key" (non-null and uniqueness)
+
+Besides of ID column in both tables, there is one more common column, `side`. If you try to join based on this column, you can see the problem. 
+
+```sqlite
+SELECT * FROM EPEX_12_20_12_13 AS A 
+INNER JOIN EPEX_USER AS B 
+ON A.SIDE = B.SIDE  
+```
+
+So the join has to be on `Primary Key`, which is non-null and has uniqueness. 
+
+##### 3.2 Left Join (Outer Join)
+
+![left](pic/left-join.png)
+
+Now, we are going to see "Left join" (a.k.a Outer Join). In inner join, only rows having common ID (primary key) are extracted. But sometimes, you feel necessity for maintaining one of the tables as a whole.  
+Let's see an example.
+
+```sqlite
+SELECT * FROM EPEX_12_20_12_13 AS A 
+LEFT JOIN EPEX_USER AS B ON A.ID = B.ID
+```
+
+Of course, you can select specific columns like inner join 
+
+```sqlite
+SELECT A.ID, B.NAME 
+FROM EPEX_12_20_12_13 AS A 
+LEFT JOIN EPEX_USER AS B 
+ON A.ID = B.ID  
+```
